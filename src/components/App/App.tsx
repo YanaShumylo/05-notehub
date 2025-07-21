@@ -9,6 +9,8 @@ import NoteList from "../NoteList/NoteList";
 import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import { fetchNotes } from "../../services/noteService";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 export default function App() {
   const [search, setSearch] = useState("");
@@ -20,6 +22,7 @@ export default function App() {
     isLoading,
     isError,
     error,
+    isFetching
   } = useQuery({
     queryKey: ["notes", debouncedSearch, currentPage],
     queryFn: () => fetchNotes({
@@ -50,9 +53,9 @@ export default function App() {
 
       <Toaster position="top-left" />
 
-      {isLoading && <p>Loading...</p>}
+      {(isLoading || isFetching) && <Loader/>}
 
-      {isError && <p>Error: {(error as Error).message}</p>}
+      {isError && <ErrorMessage error={error as Error} />}
       
       {data?.data && data.data.length > 0 && (
         <NoteList notes={data.data} onSelect={() => {}} />
