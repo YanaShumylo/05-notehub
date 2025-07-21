@@ -22,8 +22,11 @@ export default function App() {
     error,
   } = useQuery({
     queryKey: ["notes", debouncedSearch, currentPage],
-    queryFn: () => fetchNotes(debouncedSearch, currentPage),
-    // enabled: query !=="",
+    queryFn: () => fetchNotes({
+      search: debouncedSearch,
+      page: currentPage,
+      perPage: 12,
+    }),
    placeholderData: (previousData) => previousData,
 });
   const handleOpenModal = () => setIsModalOpen(true);
@@ -51,8 +54,8 @@ export default function App() {
 
       {isError && <p>Error: {(error as Error).message}</p>}
       
-      {data?.results && data.results.length > 0 && (
-        <NoteList notes={data.results} onSelect={() => {}} />
+      {data?.data && data.data.length > 0 && (
+        <NoteList notes={data.data} onSelect={() => {}} />
       )}
 
       {isModalOpen && (
