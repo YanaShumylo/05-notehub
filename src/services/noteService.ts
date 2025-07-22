@@ -13,8 +13,7 @@ const myApiKey = `Bearer ${myKey}`;
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 axios.defaults.headers.common['Authorization'] = myApiKey;
 
-console.log("➡️ Authorization header set to:", axios.defaults.headers.common["Authorization"]);
-interface NotesParamsResponse{
+interface FetchNotesParams{
     page?: number;
     perPage?: number;
     search?: string;
@@ -27,16 +26,16 @@ interface NotesHttpResponse{
   perPage: number;
 }
 
-interface NotesResponse{
+interface FetchNotesResponse{
  notes: Note[];
   totalPages: number;
 }
-export const fetchNotes = async ({ search, page = 1, perPage = 12 }: NotesParamsResponse): Promise<NotesHttpResponse> => {
-  const response = await axios.get<NotesResponse>('/notes', {
+export const fetchNotes = async ({ search, page = 1, perPage = 12 }: FetchNotesParams): Promise<NotesHttpResponse> => {
+  const response = await axios.get<FetchNotesResponse>('/notes', {
     params: {
       page,
       perPage,
-      ...(typeof search === "string" && search.trim() !== "" ? { search } : {}),
+      ...(search?.trim() ? { search } : {}),
             }
             }
         );
@@ -51,7 +50,7 @@ export const fetchNotes = async ({ search, page = 1, perPage = 12 }: NotesParams
 
 export const createNote = async (noteData: NewNoteData): Promise<Note> => {
   try {
-    const res = await axios.post<Note>(
+    const res = await axios.post<{ note: Note }>(
       "/notes",
       noteData,
       {
@@ -62,7 +61,7 @@ export const createNote = async (noteData: NewNoteData): Promise<Note> => {
       }
     );
 
-    return res.data;
+    return res.data.note;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
@@ -77,6 +76,7 @@ export const createNote = async (noteData: NewNoteData): Promise<Note> => {
   }
 };
 
-export const deleteNote = async (noteId: string) => {
-    await axios.delete(`/notes/${noteId}`);
+export const deleteNote = async (noteId: string): Promise<Note> => {
+  const response = await axios.delete<{ note: Note }>(`/notes/${noteId}`);
+  return response.data.note;
     };

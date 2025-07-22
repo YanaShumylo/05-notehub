@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
@@ -17,6 +17,11 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedSearch] = useDebounce(search, 500);
+ 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
   const {
     data,
     isLoading,
@@ -58,7 +63,7 @@ export default function App() {
       {isError && <ErrorMessage error={error as Error} />}
       
       {data?.data && data.data.length > 0 && (
-        <NoteList notes={data.data} onSelect={() => {}} />
+        <NoteList notes={data.data}/>
       )}
 
       {isModalOpen && (

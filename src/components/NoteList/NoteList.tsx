@@ -6,7 +6,7 @@ import css from "./NoteList.module.css";
 
 interface NoteListProps {
   notes: Note[];
-  onSelect: (note: Note) => void;
+onSelect?: (note: Note) => void;
 }
 
 export default function NoteList({ notes, onSelect }: NoteListProps) {
@@ -31,7 +31,7 @@ export default function NoteList({ notes, onSelect }: NoteListProps) {
       {notes.map((note) => (
         <li
           key={note.id}
-          onClick={() => onSelect(note)}
+          onClick={() => onSelect?.(note)}
           className={css.listItem}
         >
           <h2 className={css.title}>{note.title}</h2>
@@ -39,13 +39,14 @@ export default function NoteList({ notes, onSelect }: NoteListProps) {
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
             <button
-              className={css.button}
+              className={`${css.button} ${deleteNoteMutation.isPending ? css.buttonLoading : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete(note.id.toString());
               }}
+              disabled={deleteNoteMutation.isPending}
             >
-              Delete
+              {deleteNoteMutation.isPending ? "Deleting..." : "Delete"}
             </button>
           </div>
         </li>
